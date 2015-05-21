@@ -1,3 +1,5 @@
+#include <avr/wdt.h>
+
 #if !defined(__MK20DX256__) && !defined(__MK20DX128__) && !defined(__MKL26Z64__) // not Teensy 3.x/LC
 #define I2C_NOSTOP false
 #define I2C_STOP true
@@ -419,6 +421,11 @@ void powerOn()
   pinMode(PWRBTN, INPUT);
 }
 
+//MAS - Reset function which enables watchdog
+void resetArduinoBoard()
+{
+  g_resetArduino = true;
+}
 
 void checkCameraCommands()
 {
@@ -456,6 +463,16 @@ void checkCameraCommands()
           }
         }
         return;
+      case '$': //MAS- THIS IS WHAT I'M GONNA USE TO RESET THIS MOFO
+        //Reset here
+        __debug(F("mas reset triggered"));
+        while (inputAvailable()) {
+          if (myRead() == '\n') {
+            break;
+          }
+        }
+        resetArduinoBoard();
+        return; //unreachable
       case '!':
         bufp = 1;
         __debug(F("role change"));

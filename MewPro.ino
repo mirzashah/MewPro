@@ -52,10 +52,16 @@ END copy */
 // MewPro firmware version string for maintenance
 #define MEWPRO_FIRMWARE_VERSION "2015051800"
 
+//MAS - Needed so that the bootloader makes sure to reset the f'in watchdog
+#define WATCHDOG_MODS true
+
 //
 #include <Arduino.h>
 #include <EEPROM.h>
 #include "MewPro.h"
+#include <avr/wdt.h>
+
+bool g_resetArduino = false;
 
 // enable console output
 // set false if this is MewPro #0 of dual dongle configuration
@@ -169,6 +175,9 @@ void userSettings()
 
 void setup()
 {
+  MCUSR = 0; //Watchdog register
+  wdt_disable(); //MAS --Make sure watch dog is off
+  
   // Remark. Arduino Pro Mini 328 3.3V 8MHz is too slow to catch up with the highest 115200 baud.
   //     cf. http://forum.arduino.cc/index.php?topic=54623.0
   // Set 57600 baud or slower.
@@ -188,10 +197,16 @@ void setup()
   pinMode(I2CINT, INPUT);  // Teensy: default disabled
   pinMode(HBUSRDY, INPUT); // default: analog input
   pinMode(PWRBTN, INPUT);  // default: analog input
+  
+  // enable watchdog, max 8 sec
+  wdt_enable(WDTO_8S);
 }
 
 void loop() 
 {
+  if(!g_resetArduino)
+    wdt_reset(); //Resets the watchdog timer
+  
   // Attach or detach bacpac
   if (digitalRead(HBUSRDY) == HIGH) {
     if (lastHerobusState != HIGH) {

@@ -463,9 +463,8 @@ void checkCameraCommands()
           }
         }
         return;
-      case '$': //MAS- THIS IS WHAT I'M GONNA USE TO RESET THIS MOFO
-        //Reset here
-        __debug(F("mas reset triggered"));
+      case '$': //MAS- Reset logic here
+        __debug(F("arduino reset triggered"));
         while (inputAvailable()) {
           if (myRead() == '\n') {
             break;

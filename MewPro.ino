@@ -52,9 +52,6 @@ END copy */
 // MewPro firmware version string for maintenance
 #define MEWPRO_FIRMWARE_VERSION "2015051800"
 
-//MAS - Needed so that the bootloader makes sure to reset the f'in watchdog
-#define WATCHDOG_MODS true
-
 //
 #include <Arduino.h>
 #include <EEPROM.h>
